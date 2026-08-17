@@ -181,6 +181,8 @@
             margin-left: 68px;
             transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             width: calc(100% - 68px);
+            max-width: 100%;
+            overflow-x: hidden;
         }
         .sidebar:hover ~ .main-content,
         .sidebar.expanded ~ .main-content {
@@ -200,6 +202,7 @@
             font-weight: 700;
             color: rgba(255, 255, 255, 0.85);
             letter-spacing: 0.3px;
+            overflow-wrap: break-word;
         }
         .page-header .page-sub {
             font-size: 14px;
@@ -213,6 +216,7 @@
             gap: 16px;
             padding-bottom: 10px;
             overflow-y: auto;
+            width: 100%;
         }
 
         .page-view {
@@ -245,6 +249,7 @@
             border-radius: 28px;
             padding: 20px 18px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
         }
 
         .card-title {
@@ -252,6 +257,7 @@
             font-weight: 600;
             color: rgba(255, 255, 255, 0.85);
             margin-bottom: 14px;
+            overflow-wrap: break-word;
         }
 
         /* Dashboard */
@@ -290,12 +296,15 @@
             font-size: 16px;
             font-weight: 600;
             color: white;
+            overflow-wrap: break-word;
         }
         .cash-card .amount {
             font-size: 26px;
             font-weight: 700;
             letter-spacing: -0.5px;
             margin-top: 2px;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
         .cash-card .label-small {
             font-size: 11px;
@@ -368,6 +377,7 @@
             display: flex;
             flex-direction: column;
             flex: 1;
+            min-width: 0;
         }
         .ie-pill .info .label {
             font-size: 10px;
@@ -379,6 +389,8 @@
         .ie-pill .info .value {
             font-size: 18px;
             font-weight: 700;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
         .ie-pill.expense {
             background: rgba(239, 68, 68, 0.08);
@@ -455,6 +467,8 @@
             font-weight: 500;
             color: rgba(255, 255, 255, 0.5);
             white-space: nowrap;
+            overflow-wrap: break-word;
+            max-width: 100%;
         }
 
         .cat-filter-btn {
@@ -490,6 +504,7 @@
             outline: none;
             letter-spacing: 0.3px;
             transition: border 0.2s, background 0.2s;
+            max-width: 100%;
         }
         .month-selector input[type="month"]:focus {
             border-color: rgba(168, 181, 255, 0.3);
@@ -533,6 +548,7 @@
             font-weight: 600;
             color: rgba(255, 255, 255, 0.7);
             margin-bottom: 10px;
+            overflow-wrap: break-word;
         }
         .budget-person-overview .person-budget-card .pb-title .pb-accent {
             color: #a8b5ff;
@@ -543,10 +559,14 @@
             padding: 4px 0;
             font-size: 14px;
             color: rgba(255, 255, 255, 0.5);
+            gap: 8px;
         }
         .budget-person-overview .person-budget-card .pb-row .pb-value {
             font-weight: 600;
             color: rgba(255, 255, 255, 0.8);
+            overflow-wrap: break-word;
+            word-break: break-word;
+            text-align: right;
         }
         .budget-person-overview .person-budget-card .pb-row .pb-value.positive {
             color: #34d399;
@@ -582,6 +602,7 @@
             margin-bottom: 10px;
             padding-bottom: 4px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            overflow-wrap: break-word;
         }
         .budget-person-col .bp-title .remaining {
             font-size: 15px;
@@ -622,6 +643,7 @@
             cursor: pointer;
             transition: background 0.2s;
             user-select: none;
+            gap: 8px;
         }
         .budget-category-header:hover {
             background: rgba(255, 255, 255, 0.06);
@@ -633,11 +655,16 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            flex: 1;
+            min-width: 0;
         }
         .budget-category-header .cat-total {
             font-size: 15px;
             font-weight: 500;
             color: rgba(255, 255, 255, 0.5);
+            white-space: nowrap;
         }
         .budget-category-header .cat-total .actual {
             color: #a8b5ff;
@@ -683,15 +710,19 @@
             justify-content: space-between;
             align-items: center;
             font-size: 14px;
+            gap: 8px;
         }
         .budget-sub-row .sub-name {
             color: rgba(255, 255, 255, 0.6);
             font-size: 14px;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
         .budget-sub-row .sub-numbers {
             color: rgba(255, 255, 255, 0.4);
             font-weight: 400;
             font-size: 14px;
+            white-space: nowrap;
         }
         .budget-sub-row .sub-numbers .actual {
             color: #a8b5ff;
@@ -816,6 +847,7 @@
             margin-bottom: 18px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             transition: border-color 0.2s;
+            overflow: hidden;
         }
         .savings-fund-card:last-child {
             margin-bottom: 0;
@@ -829,12 +861,15 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 14px;
+            gap: 12px;
         }
         .savings-card-left .fund-name {
             font-size: 20px;
             font-weight: 700;
             color: rgba(255, 255, 255, 0.9);
             margin-bottom: 2px;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
         .savings-card-left .fund-bank {
             font-size: 13px;
@@ -857,6 +892,8 @@
             font-size: 22px;
             font-weight: 700;
             color: rgba(255, 255, 255, 0.6);
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
 
         .savings-card-middle {
@@ -895,6 +932,7 @@
         .savings-contributions .contrib-row {
             font-size: 14px;
             color: rgba(255, 255, 255, 0.5);
+            overflow-wrap: break-word;
         }
         .savings-contributions .contrib-row .label {
             font-weight: 600;
@@ -946,6 +984,7 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
+            overflow: hidden;
         }
 
         /* Simon header — orange */
@@ -990,6 +1029,8 @@
             font-size: 24px;
             font-weight: 700;
             letter-spacing: -0.3px;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
 
         .person-metrics {
@@ -1030,6 +1071,7 @@
             font-size: 15px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.75);
+            overflow-wrap: break-word;
         }
         .section-chevron {
             font-size: 12px;
@@ -1055,6 +1097,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 14px;
             padding: 14px 16px;
+            overflow: hidden;
         }
         .rec-card-badges {
             display: flex;
@@ -1105,11 +1148,13 @@
             font-weight: 600;
             color: rgba(255, 255, 255, 0.8);
             margin-bottom: 4px;
+            overflow-wrap: break-word;
         }
         .rec-card-desc {
             font-size: 13px;
             color: rgba(255, 255, 255, 0.5);
             line-height: 1.45;
+            overflow-wrap: break-word;
         }
         .rec-card-divider {
             height: 1px;
@@ -1131,6 +1176,8 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             padding: 3px 10px;
             border-radius: 30px;
+            overflow-wrap: break-word;
+            max-width: 100%;
         }
 
         /* Budget & Spent/Received tiles */
@@ -1147,6 +1194,8 @@
             font-size: 11px;
             font-weight: 600;
             letter-spacing: 0.3px;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
         .metric-tile.budget {
             background: rgba(255, 255, 255, 0.06);
@@ -1207,6 +1256,7 @@
             color: white;
             transition: border 0.2s;
             appearance: auto;
+            max-width: 100%;
         }
         .form-group select option {
             background: #1a1a2e;
@@ -1248,6 +1298,7 @@
             font-size: 13px;
             display: none;
             font-weight: 500;
+            overflow-wrap: break-word;
         }
         .message.success {
             display: block;
@@ -1310,6 +1361,7 @@
             color: white;
             font-size: 13px;
             width: 140px;
+            max-width: 100%;
         }
         .tx-date-filter .load-btn {
             background: rgba(168, 181, 255, 0.12);
@@ -1343,6 +1395,8 @@
             padding: 6px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             color: rgba(255, 255, 255, 0.7);
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
         .tx-table .amount-positive {
             color: #22c55e;
@@ -1389,6 +1443,7 @@
             font-weight: 700;
             color: rgba(255, 255, 255, 0.85);
             margin-bottom: 4px;
+            overflow-wrap: break-word;
         }
         .modal-box .modal-sub {
             font-size: 14px;
@@ -1497,19 +1552,21 @@
                 font-size: 12px;
             }
 
+            /* Stack cash cards vertically to avoid cramped text overflow */
             .cash-cards {
-                grid-template-columns: 1fr 1fr 1fr;
-                gap: 6px;
+                grid-template-columns: 1fr;
+                gap: 10px;
             }
             .cash-card {
-                padding: 12px 10px 10px 10px;
+                padding: 14px 16px 12px 16px;
             }
             .cash-card .amount {
-                font-size: 18px;
+                font-size: 20px;
             }
             .cash-card.combined .amount {
-                font-size: 22px;
+                font-size: 24px;
             }
+
             .ie-grid {
                 grid-template-columns: 1fr;
                 gap: 8px;
@@ -1581,6 +1638,9 @@
                 flex-wrap: wrap;
                 gap: 4px;
             }
+            .budget-sub-row .sub-numbers {
+                white-space: normal; /* allow wrapping on very small screens */
+            }
             .sub-progress-wrap {
                 flex-wrap: wrap;
             }
@@ -1614,6 +1674,25 @@
             }
             .form-row {
                 grid-template-columns: 1fr;
+            }
+
+            /* Login screen responsiveness */
+            #loginScreen > div {
+                padding: 24px 18px !important;
+            }
+            #loginScreen h1 {
+                font-size: 24px !important;
+            }
+            #loginScreen p {
+                font-size: 13px !important;
+            }
+
+            /* Allow budget category header to wrap */
+            .budget-category-header {
+                flex-wrap: wrap;
+            }
+            .budget-category-header .cat-total {
+                margin-left: auto;
             }
         }
 
@@ -1694,10 +1773,170 @@
         .hidden {
             display: none !important;
         }
+
+        /* Transaction table scroll on small screens */
+        #txTableContainer {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tx-table {
+            min-width: 600px; /* Prevent cells from squishing; container scrolls */
+        }
+
+/* ===== VIEW MODE TOGGLE BUTTONS ===== */
+.view-mode-toggle {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    z-index: 10000; /* always on top */
+    display: flex;
+    gap: 8px;
+}
+.view-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 8px 14px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.view-btn.active {
+    background: rgba(168, 181, 255, 0.2);
+    border-color: rgba(168, 181, 255, 0.4);
+    color: white;
+}
+
+/* ===== FORCED MOBILE LAYOUT (when body has class "force-mobile") ===== */
+body.force-mobile .sidebar {
+    width: 56px;
+    padding: 14px 0 12px 0;
+}
+body.force-mobile .sidebar:hover,
+body.force-mobile .sidebar.expanded {
+    width: 190px;
+}
+body.force-mobile .sidebar .sidebar-brand .brand-icon {
+    font-size: 22px;
+}
+body.force-mobile .sidebar .brand-text {
+    font-size: 13px;
+}
+body.force-mobile .sidebar .nav-item {
+    padding: 10px 12px;
+    font-size: 13px;
+}
+body.force-mobile .sidebar .nav-item .nav-icon svg {
+    width: 20px;
+    height: 20px;
+}
+body.force-mobile .main-content {
+    padding: 12px 12px 20px 12px;
+    margin-left: 56px;
+    width: calc(100% - 56px);
+}
+body.force-mobile .sidebar:hover ~ .main-content,
+body.force-mobile .sidebar.expanded ~ .main-content {
+    margin-left: 190px;
+    width: calc(100% - 190px);
+}
+body.force-mobile .page-header .page-title {
+    font-size: 20px;
+}
+body.force-mobile .page-header .page-sub {
+    font-size: 12px;
+}
+body.force-mobile .cash-cards {
+    grid-template-columns: 1fr; /* stack the three cards */
+    gap: 10px;
+}
+body.force-mobile .cash-card {
+    padding: 14px 16px 12px 16px;
+}
+body.force-mobile .cash-card .amount {
+    font-size: 20px;
+}
+body.force-mobile .cash-card.combined .amount {
+    font-size: 24px;
+}
+body.force-mobile .ie-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+body.force-mobile .ie-col .person-label {
+    font-size: 16px;
+}
+body.force-mobile .budget-person-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+body.force-mobile .budget-person-overview {
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+body.force-mobile .savings-fund-card {
+    padding: 18px 14px;
+}
+body.force-mobile .savings-card-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+body.force-mobile .savings-card-right {
+    text-align: left;
+    margin-left: 0;
+}
+body.force-mobile .savings-card-right .goal-amount {
+    font-size: 18px;
+}
+body.force-mobile .savings-card-left .fund-name {
+    font-size: 17px;
+}
+body.force-mobile .liquid-bar-container {
+    height: 44px;
+}
+body.force-mobile .savings-card-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+body.force-mobile .savings-contributions .contrib-row {
+    font-size: 13px;
+}
+body.force-mobile .savings-percentage-badge {
+    font-size: 12px;
+    padding: 2px 12px;
+}
+body.force-mobile .budget-sub-row .sub-main {
+    font-size: 13px;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+body.force-mobile .budget-sub-row .sub-numbers {
+    white-space: normal;
+}
+body.force-mobile .budget-category-header {
+    flex-wrap: wrap;
+}
+body.force-mobile .tx-table {
+    font-size: 11px;
+}
+body.force-mobile .form-row {
+    grid-template-columns: 1fr;
+}
+
     </style>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+
+    <!-- VIEW MODE TOGGLE -->
+<div class="view-mode-toggle">
+    <button class="view-btn active" id="desktopViewBtn">🖥️ Desktop</button>
+    <button class="view-btn" id="mobileViewBtn">📱 Mobile</button>
+</div>    
 
     <!-- ===== LOGIN SCREEN ===== -->
 <div id="loginScreen" style="position:fixed; top:0; left:0; right:0; bottom:0; z-index:9999; background:#0d0d1a; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
@@ -1818,7 +2057,7 @@
                         <span class="card-title" style="margin-bottom:0; font-size:15px;" id="categoryDetailTitle">Category</span>
                         <button id="closeCategoryDetail" style="background:none; border:none; color:rgba(255,255,255,0.3); font-size:20px; cursor:pointer;">✕</button>
                     </div>
-                    <div style="display:flex; gap:16px; margin-bottom:10px;">
+                    <div style="display:flex; gap:16px; margin-bottom:10px; flex-wrap: wrap;">
                         <div><span style="color:rgba(255,255,255,0.3); font-size:12px;" id="catDetailSpentLabel">Spent</span><br><span id="catDetailSpent" style="font-size:20px; font-weight:700; color:#a8b5ff;">₱0</span></div>
                         <div><span style="color:rgba(255,255,255,0.3); font-size:12px;">Budgeted</span><br><span id="catDetailBudgeted" style="font-size:20px; font-weight:700; color:rgba(255,255,255,0.6);">₱0</span></div>
                         <div><span style="color:rgba(255,255,255,0.3); font-size:12px;" id="catDetailRemainingLabel">Remaining</span><br><span id="catDetailRemaining" style="font-size:20px; font-weight:700; color:#fcd34d;">₱0</span></div>
@@ -2465,9 +2704,9 @@
                 }
                 const color = subRemaining >= 0 ? '#34d399' : '#ef4444';
                 html += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; border-radius:8px; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.03);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; border-radius:8px; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.03); flex-wrap: wrap; gap: 4px;">
                         <span style="font-size:13px; color:rgba(255,255,255,0.6);">${sub}</span>
-                        <div style="display:flex; gap:16px; font-size:13px;">
+                        <div style="display:flex; gap:16px; font-size:13px; flex-wrap: wrap;">
                             <span style="color:#a8b5ff;">${formatCurrency(vals.actual)}</span>
                             <span style="color:rgba(255,255,255,0.2);">/</span>
                             <span style="color:rgba(255,255,255,0.4);">${formatCurrency(vals.budgeted)}</span>
@@ -3812,6 +4051,25 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(addLogoutButton, 500);
 });
 
+    </script>
+    <script>
+        // Get the buttons
+        const desktopViewBtn = document.getElementById('desktopViewBtn');
+        const mobileViewBtn = document.getElementById('mobileViewBtn');
+
+        // When "Desktop" is clicked
+        desktopViewBtn.addEventListener('click', function () {
+            document.body.classList.remove('force-mobile');
+            desktopViewBtn.classList.add('active');
+            mobileViewBtn.classList.remove('active');
+        });
+
+        // When "Mobile" is clicked
+        mobileViewBtn.addEventListener('click', function () {
+            document.body.classList.add('force-mobile');
+            mobileViewBtn.classList.add('active');
+            desktopViewBtn.classList.remove('active');
+        });
     </script>
 </body>
 </html>
