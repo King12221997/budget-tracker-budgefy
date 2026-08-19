@@ -2434,7 +2434,88 @@
             .budget-category-header .cat-name { font-size: 14px; }
             .google-btn-wrap { height: 46px; }
         }
+        /* v8: GSI official button overlay on the gradient pill */
+        .google-btn-wrap { position: relative; }
+        .google-btn-wrap .gsi-overlay {
+            position: absolute; top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: min(252px, 100%); height: 46px;
+            z-index: 3; opacity: 0.001;
+        }
+        .google-btn-wrap .gsi-overlay iframe {
+            width: 100% !important; height: 46px !important;
+        }
+        /* ===== Budget person cards: amounts closer to labels, aligned (mobile) ===== */
+        @media (max-width: 840px) {
+            .budget-person-overview .person-budget-card .pb-rows {
+                grid-template-columns: max-content max-content;
+                gap: 8px 10px;
+            }
+            .budget-person-overview .person-budget-card .pb-row .pb-label .pb-desc {
+                max-width: 120px;
+            }
+            .budget-person-overview .person-budget-card .pb-row .pb-value {
+                justify-self: start;
+                text-align: left;
+            }
+        }
+
+        /* ===== Unfolded (501-840px): ring on the right, centered between amounts and tile edge ===== */
+        @media (min-width: 501px) and (max-width: 840px) {
+            .budget-person-overview .person-budget-card {
+                flex-direction: row;
+                align-items: center;
+                gap: 12px;
+            }
+            .budget-person-overview .person-budget-card .pb-body {
+                flex: 0 1 auto;
+            }
+            .budget-person-overview .person-budget-card .pb-ring-wrap {
+                flex: 1 1 0;
+                margin: 0;
+                justify-content: center;
+            }
+            .budget-person-overview .person-budget-card .pb-ring-wrap svg {
+                width: 100px;
+                height: 100px;
+            }
+        }
+        /* ---- Transaction row actions: side-by-side, themed SVG icons ---- */
+        .tx-row-actions { display: flex !important; flex-direction: row !important; align-items: center; justify-content: center; gap: 8px; flex-wrap: nowrap; }
+        .tx-row-actions button { display: inline-flex !important; align-items: center; justify-content: center; width: auto !important; min-height: 34px; padding: 6px 9px; border-radius: 8px; line-height: 1; }
+        .tx-row-actions button svg { flex-shrink: 0; }
+        /* ---- Google sign-in: keep the single pill centered ---- */
+        .google-btn-wrap { margin-left: auto; margin-right: auto; }
+        /* ---- Edit-transaction popup modal (themed, blurred backdrop) ---- */
+        #editTxModal .modal-box { max-width: 430px; }
+        #editTxModal .modal-input-group { margin-bottom: 12px; text-align: left; }
+        #editTxModal .modal-input-group label { display: block; margin-bottom: 5px; font-size: 12px; color: rgba(255,255,255,0.55); letter-spacing: 0.3px; }
+        #editTxModal .modal-input-group input,
+        #editTxModal .modal-input-group select {
+            width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06);
+            color: #fff; font-size: 14px; outline: none; -webkit-appearance: none; appearance: none;
+        }
+        #editTxModal .modal-input-group select { background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(255,255,255,0.5)'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+        #editTxModal .modal-input-group select option { background: #171330; color: #fff; }
+        #editTxModal .modal-input-group input:focus,
+        #editTxModal .modal-input-group select:focus { border-color: #a8b5ff; box-shadow: 0 0 0 3px rgba(168,181,255,0.15); }
+        #editTxModal.modal-overlay { background: rgba(6,6,16,0.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        /* Guarantee the invisible Google layer sits exactly over the pill — kills any stray second button */
+        /* BUILD 2026-08-19-sync4 — the OFFICIAL Google "Sign in with Google" button is the real,
+           working control, rendered by GIS into #g_id_signin and MASKED by the design pill:
+           stack inside #googleBtnWrap (position:relative) — z1: Google's own button (visible,
+           clickable, fills the box); z2: #googleSignInBtn gradient pill with pointer-events:none,
+           so every tap passes THROUGH the pill to Google's button. No pinning, no opacity tricks. */
+        #googleBtnWrap { position: relative !important; }
+        #g_id_signin { position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important; opacity: 1 !important; overflow: hidden !important; z-index: 1 !important; pointer-events: auto !important; }
+        #g_id_signin { opacity: 0.001 !important; } /* BUILD 2026-08-19-sync4: official button INVISIBLE but full-size & live; pill is the only VISIBLE button */
+        #g_id_signin iframe { display: block !important; border: 0 !important; width: 100% !important; height: 100% !important; }
+        #googleSignInBtn { position: relative !important; width: 100% !important; height: 100% !important; z-index: 2 !important; pointer-events: none !important; cursor: pointer; }
+        #googleBtnWrap.mask-hover #googleSignInBtn { filter: brightness(1.1); }
+        #googleBtnWrap.mask-pressed #googleSignInBtn { transform: scale(0.98); }
     </style>
+        <!-- BUILD 2026-08-19-sync4 — exactly ONE VISIBLE sign-in button: the gradient pill (design) is all you see; Google's official button is INVISIBLE underneath and is still the live click target. If you still see 2 buttons, this file is NOT the one loaded; hard-refresh / clear site data. -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
@@ -2454,7 +2535,8 @@
             </div>
         </div>
 
-        <div id="g_id_onload" data-client_id="1026075114984-3i6ar2tilp0njredtpvi2s9dp78ne7eb.apps.googleusercontent.com" style="display:none;"></div>
+        <!-- data-auto_prompt="false" stops Google's One Tap popup from auto-appearing (the "2nd button") -->
+        <div id="g_id_onload" data-client_id="1026075114984-3i6ar2tilp0njredtpvi2s9dp78ne7eb.apps.googleusercontent.com" data-auto_prompt="false" style="display:none;"></div>
         <div id="googleBtnWrap" class="google-btn-wrap" style="display:none;">
             <button type="button" id="googleSignInBtn" class="g-btn-face">
                 <svg class="g-logo" viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.4 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.1 5.7l6.2 5.2C36.9 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>
@@ -2462,6 +2544,7 @@
             </button>
         </div>
 
+        <div id="g_id_signin" class="gsi-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;margin:0;padding:0;opacity:0.001;overflow:hidden;z-index:1;pointer-events:auto;"></div>
         <div id="loginStatus" style="margin-top:12px; font-size:13px; color:rgba(255,255,255,0.3); min-height:20px;"></div>
     </div>
 </div>
@@ -2764,7 +2847,227 @@
         //  CONFIG
         // ============================================================
         // ★★★ REPLACE WITH YOUR DEPLOYED APPS SCRIPT URL ★★★
-        const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzt9GQgMARrywx7i57hto2Pe1HOvQ5iHRZCg3vLnEHHszF5MrbIuIfbYAks-smdjJ5XDg/exec";
+        const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlgKHgg2KFX-pEUDRZvWh-gCknq7nvN_lPGaaTRTbK6TnBoFSQ9F_ks5APbBs717GP/exec";
+
+        // ============================================================
+        //  HARD CACHE LAYER — first load fetches + saves; every later
+        //  load renders instantly from cache while refreshing in the
+        //  background. After any add/edit/delete (POST), cached URLs
+        //  are refreshed silently so reloads stay fast AND accurate.
+        // ============================================================
+        (function () {
+            var _origFetch = window.fetch.bind(window);
+            var CACHE_PREFIX = 'bt_cache_';
+            function cacheGet(u) { try { var raw = localStorage.getItem(CACHE_PREFIX + u); return raw ? JSON.parse(raw).d : null; } catch (e) { return null; } }
+            function cacheSet(u, text) { try { localStorage.setItem(CACHE_PREFIX + u, JSON.stringify({ t: Date.now(), d: text })); } catch (e) {} }
+            function cacheUrls() { var out = []; try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && k.indexOf(CACHE_PREFIX) === 0) out.push(k.slice(CACHE_PREFIX.length)); } } catch (e) {} return out; }
+            window.fetch = function (input, init) {
+                var url = typeof input === 'string' ? input : (input && input.url ? input.url : '');
+                if (url.indexOf(APP_SCRIPT_URL) !== 0) return _origFetch(input, init);
+                var isGet = !init || !init.method || String(init.method).toUpperCase() === 'GET';
+                if (isGet) {
+                    var cached = cacheGet(url);
+                    if (cached !== null) {
+                        setTimeout(function () {
+                            _origFetch(url, init).then(function (r) { return r.text(); }).then(function (t) { cacheSet(url, t); }).catch(function () {});
+                        }, 0);
+                        return Promise.resolve(new Response(cached, { status: 200, headers: { 'Content-Type': 'application/json' } }));
+                    }
+                    return _origFetch(url, init).then(function (r) {
+                        try { r.clone().text().then(function (t) { if (r.ok) cacheSet(url, t); }).catch(function () {}); } catch (e) {}
+                        return r;
+                    });
+                }
+                return _origFetch(url, init).then(function (r) {
+                    if (r.ok) {
+                        setTimeout(function () {
+                            cacheUrls().forEach(function (u) {
+                                _origFetch(u).then(function (rr) { return rr.text(); }).then(function (t) { cacheSet(u, t); }).catch(function () {});
+                            });
+                        }, 0);
+                    }
+                    return r;
+                });
+            };
+        })();
+
+        // ============================================================
+        //  EDIT TRANSACTION — themed popup modal (pre-filled details,
+        //  blurred backdrop). Replaces the old fill-the-top-form flow.
+        // ============================================================
+        var editingTxModal = null;
+        // BUILD 2026-08-19-sync7: edit-save POST now sends Content-Type: application/x-www-form-urlencoded (fixes "Error: Unknown action:" — without it fetch defaults to text/plain, Apps Script leaves e.parameter EMPTY, backend sees action=''); success check hardened to data.success !== true.
+        function saveEditTxModal2() {
+            var t = editingTxModal;
+            if (!t) return;
+            var f = function (id) { return document.getElementById(id); };
+            var ov = document.getElementById('txSavingOverlay');
+            closeEditTxModal();
+            if (ov) ov.style.display = 'flex';
+            try {
+                var formData = new URLSearchParams();
+                formData.append('action', 'updateTransaction');
+                formData.append('key', txKey(t));
+                ['date', 'person', 'type', 'category', 'subcategory', 'description'].forEach(function (k) {
+                    var el = f('txm' + k.charAt(0).toUpperCase() + k.slice(1));
+                    formData.append(k, el ? el.value : (t[k] != null ? t[k] : ''));
+                });
+                formData.append('amount', f('txmAmount') ? f('txmAmount').value : (t.amount != null ? t.amount : ''));
+                ['date', 'person', 'type', 'category', 'subcategory', 'description', 'amount'].forEach(function (k) {
+                    formData.append('orig' + k.charAt(0).toUpperCase() + k.slice(1), t[k] != null ? t[k] : '');
+                });
+                fetch(APP_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) {
+                        if (!data || data.success !== true) throw new Error((data && data.error) || 'Update failed');
+                        if (ov) ov.style.display = 'none';
+                        try { showMessage('Transaction updated!', 'success'); } catch (e) {}
+                        try { Promise.resolve(loadTransactions()).catch(function () {}); } catch (e) {}
+                    })
+                    .catch(function (err) {
+                        if (ov) ov.style.display = 'none';
+                        try { showMessage('Error: ' + err.message, 'error'); } catch (e) {}
+                    });
+            } catch (err) {
+                if (ov) ov.style.display = 'none';
+                try { showMessage('Error: ' + err.message, 'error'); } catch (e) {}
+            }
+        }
+        function openEditTxModal(t) {
+            editingTxModal = t;
+            var f = function (id) { return document.getElementById(id); };
+            f('txmDate').value = String(t.date || '').slice(0, 10);
+            ['person', 'type', 'category', 'subcategory'].forEach(function (n) {
+                var src = f(n), dst = f('txm' + n.charAt(0).toUpperCase() + n.slice(1));
+                dst.innerHTML = '';
+                Array.prototype.forEach.call(src.options, function (o) {
+                    var no = document.createElement('option');
+                    no.value = o.value; no.textContent = o.textContent; dst.appendChild(no);
+                });
+                if (dst.options.length === 0 && t[n]) {
+                    var no2 = document.createElement('option');
+                    no2.value = t[n]; no2.textContent = t[n]; dst.appendChild(no2);
+                }
+                dst.value = t[n] || '';
+            });
+            f('txmAmount').value = t.amount != null ? t.amount : '';
+            f('txmDescription').value = t.description || '';
+            if (f('txmPerson') && f('txmPerson').options.length) f('txmPerson').value = t.person || '';
+            if (f('txmType') && f('txmType').options.length) f('txmType').value = t.type || '';
+            populateTxmCategories();
+            f('txmCategory').value = t.category || '';
+            populateTxmSubcategory();
+            f('txmSubcategory').value = t.subcategory || '';
+            if (t.subcategory && f('txmSubcategory').value !== t.subcategory) {
+                var fb = document.createElement('option');
+                fb.value = t.subcategory; fb.textContent = t.subcategory;
+                f('txmSubcategory').appendChild(fb);
+                f('txmSubcategory').value = t.subcategory;
+            }
+            f('editTxSub').textContent = 'Editing ' + (t.date || '') + ' · ' + (t.description || 'No description');
+            f('editTxModal').classList.add('active');
+        }
+        function closeEditTxModal() {
+            var m = document.getElementById('editTxModal');
+            if (m) m.classList.remove('active');
+            editingTxModal = null;
+        }
+        // BUILD 2026-08-19-sync5: modal category/subcategory now mirror the Add form (populated from type/category, not from the main form's selects)
+        function populateTxmCategories() {
+            var sel = document.getElementById('txmCategory');
+            var type = document.getElementById('txmType').value;
+            var prev = sel.value;
+            var list = type === 'Income' ? incomeCategories : expenseCategories;
+            sel.innerHTML = '';
+            list.forEach(function (c) {
+                var o = document.createElement('option');
+                o.value = c; o.textContent = c;
+                sel.appendChild(o);
+            });
+            if (prev && sel.querySelector('option[value="' + prev + '"]')) sel.value = prev;
+        }
+        function populateTxmSubcategory() {
+            var sel = document.getElementById('txmSubcategory');
+            var cat = document.getElementById('txmCategory').value;
+            sel.innerHTML = '';
+            if (!cat) {
+                var ph = document.createElement('option');
+                ph.value = ''; ph.textContent = 'Select category first';
+                sel.appendChild(ph);
+                sel.disabled = true;
+                return;
+            }
+            var subs = subcategoryMap[cat];
+            if (!subs || !subs.length) {
+                var ph2 = document.createElement('option');
+                ph2.value = ''; ph2.textContent = 'No subcategories';
+                sel.appendChild(ph2);
+                sel.disabled = true;
+                return;
+            }
+            var dflt = document.createElement('option');
+            dflt.value = ''; dflt.textContent = 'Select subcategory...';
+            sel.appendChild(dflt);
+            subs.forEach(function (s) {
+                var o = document.createElement('option');
+                o.value = s; o.textContent = s;
+                sel.appendChild(o);
+            });
+            sel.disabled = false;
+        }
+        function saveEditTxModal() {
+            var t = editingTxModal;
+            if (!t) return;
+            var f = function (id) { return document.getElementById(id); };
+            var btn = f('txmSave'); btn.disabled = true;
+            try {
+                var formData = new URLSearchParams();
+                formData.append('action', 'updateTransaction');
+                formData.append('key', txKey(t));
+                ['date', 'person', 'type', 'category', 'subcategory', 'description'].forEach(function (k) {
+                    formData.append(k, f('txm' + k.charAt(0).toUpperCase() + k.slice(1)).value);
+                });
+                formData.append('amount', f('txmAmount').value);
+                ['date', 'person', 'type', 'category', 'subcategory', 'description', 'amount'].forEach(function (k) {
+                    formData.append('orig' + k.charAt(0).toUpperCase() + k.slice(1), t[k] != null ? t[k] : '');
+                });
+                fetch(APP_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) {
+                        if (data && data.success === false) throw new Error(data.error || 'Update failed');
+                        closeEditTxModal();
+                        showMessage('Transaction updated!', 'success');
+                        safe(loadTransactions());
+                        safe(refreshAll());
+                    })
+                    .catch(function (err) { showMessage('Error: ' + err.message, 'error'); })
+                    .then(function () { btn.disabled = false; });
+            } catch (err) {
+                btn.disabled = false;
+                showMessage('Error: ' + err.message, 'error');
+            }
+        }
+        // Intercept edit-button clicks BEFORE the old in-form editor runs (capture phase)
+        document.addEventListener('click', function (ev) {
+            var btn = ev.target && ev.target.closest ? ev.target.closest('.tx-edit-btn') : null;
+            if (!btn) return;
+            ev.stopPropagation();
+            var idx = parseInt(btn.dataset.index, 10);
+            var t = Number.isInteger(idx) && Array.isArray(allTxs) ? allTxs[idx] : null;
+            if (t) openEditTxModal(t);
+        }, true);
+        document.addEventListener('DOMContentLoaded', function () {
+            var m = document.getElementById('editTxModal');
+            if (!m) return;
+            document.getElementById('txmCancel').addEventListener('click', closeEditTxModal);
+            // Save is bound inline on the button (onclick="saveEditTxModal2()") for reliability.
+            m.addEventListener('click', function (e) { if (e.target === m) closeEditTxModal(); });
+            document.getElementById('txmType').addEventListener('change', function () {
+                populateTxmCategories();
+                populateTxmSubcategory();
+            });
+            document.getElementById('txmCategory').addEventListener('change', populateTxmSubcategory);
+        });
 
         const BANK_MAP = {
             "Emergency Fund": "GoTyme",
@@ -3877,7 +4180,7 @@
                         <td>${t.subcategory || 'N/A'}</td>
                         <td>${t.description || ''}</td>
                         <td class="${amountClass}">${formatCurrency(t.amount)}</td>
-                        <td class="tx-row-actions"><button type="button" class="tx-edit-btn" data-index="${allTxs.indexOf(t)}" title="Edit transaction">✏️</button><button type="button" class="tx-del-btn" data-index="${allTxs.indexOf(t)}" title="Delete transaction">🗑️</button></td>
+                        <td class="tx-row-actions"><button type="button" class="tx-edit-btn" data-index="${allTxs.indexOf(t)}" title="Edit transaction"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button><button type="button" class="tx-del-btn" data-index="${allTxs.indexOf(t)}" title="Delete transaction"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button></td>
                     </tr>`;
             });
             html += '</tbody></table>';
@@ -4059,14 +4362,17 @@
             requestAnimationFrame(animateFunds);
         }
 
-        async function loadSavings() {
+        async function loadSavings(forceRefresh) {
             const container = document.getElementById('savingsContainer');
+            // BUILD 2026-08-19-sync5: load once — reuse cached savingsData unless force-refresh is requested
+            if (!forceRefresh && savingsData && savingsData.funds) return;
             container.innerHTML = '<div class="loading-text">Loading savings data...</div>';
 
             try {
                 const url = APP_SCRIPT_URL + '?action=savings';
                 const response = await fetch(url, { method: 'GET' });
                 const data = await response.json();
+                savingsData = data;
                 if (data.error) {
                     container.innerHTML = '<div style="color:rgba(255,255,255,0.5);">Error: ' + data.error + '</div>';
                     return;
@@ -4672,7 +4978,7 @@
         monthPicker.value = '2026-08';
         budgetMonthPicker.value = '2026-08';
 
-        loadBtn.addEventListener('click', () => loadDashboard(true));
+        loadBtn.addEventListener('click', () => { loadDashboard(true); loadSavings(true); });
         loadBudgetBtn.addEventListener('click', () => loadBudgetPage(true));
 
         setTimeout(() => loadDashboard(false), 300);
@@ -4761,12 +5067,61 @@ function selectProfile(profile) {
 
     // Show the custom gradient button (real click -> Google One Tap prompt)
     document.getElementById('googleBtnWrap').style.display = 'block';
+    const gsiOverlay = document.getElementById('g_id_signin');
+    if (gsiOverlay && typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+        try {
+            google.accounts.id.renderButton(gsiOverlay, { type: 'standard', theme: 'outline', size: 'large', shape: 'pill', width: 252 });
+            setTimeout(function() {
+                if (!gsiOverlay.querySelector('iframe')) { gsiOverlay.style.display = 'none'; }
+            }, 900);
+        } catch (e) { console.error('GSI renderButton error:', e); gsiOverlay.style.display = 'none'; }
+
+        // BUILD 2026-08-19-sync4 — the gradient pill MASKS Google's official button (CSS pointer-events:none); the official button is INVISIBLE (opacity 0.001) but full-size and live; taps pass through the pill to it.
+        // Google's official button is rendered inside #g_id_signin, then pinned invisibly (opacity 0.001,
+        // z-index 5, clickable) exactly over the pill via getBoundingClientRect, so taps on the pill hit
+        // Google's own UI. Works regardless of where the div sits in the DOM; re-applies on resize/scroll
+        // and whenever Google's script injects the iframe.
+        function pinOverlayToPill() {
+            var pill = document.getElementById('googleSignInBtn');
+            var ov = document.getElementById('g_id_signin');
+            if (!pill || !ov) return;
+            var r = pill.getBoundingClientRect();
+            if (!r.width || !r.height) return;
+            ov.style.position = 'fixed';
+            ov.style.top = r.top + 'px';
+            ov.style.left = r.left + 'px';
+            ov.style.width = r.width + 'px';
+            ov.style.height = r.height + 'px';
+            ov.style.margin = '0';
+            ov.style.padding = '0';
+            ov.style.opacity = '0.001';
+            ov.style.zIndex = '5';
+            ov.style.pointerEvents = 'auto';
+            ov.style.overflow = 'hidden';
+            var f = ov.querySelector('iframe');
+            if (f) f.style.opacity = '0.001';
+        }
+        pinOverlayToPill();
+        window.addEventListener('resize', pinOverlayToPill);
+        window.addEventListener('scroll', pinOverlayToPill, true);
+        if (window.MutationObserver && gsiOverlay) {
+            new MutationObserver(function () {
+                gsiOverlay.style.opacity = '0.001';
+                var f = gsiOverlay.querySelector('iframe');
+                if (f) f.style.opacity = '0.001';
+                pinOverlayToPill();
+            }).observe(gsiOverlay, { childList: true, subtree: true });
+        }
+    }
 
     const signInBtn = document.getElementById('googleSignInBtn');
     if (signInBtn && !signInBtn.dataset.bound) {
         signInBtn.dataset.bound = '1';
         signInBtn.addEventListener('click', function() {
-            try { google.accounts.id.prompt(); } catch (e) { console.error('GSI prompt error:', e); }
+            try {
+                const ov = document.getElementById('g_id_signin');
+                if (!ov || !ov.querySelector('iframe')) { google.accounts.id.prompt(); }
+            } catch (e) { console.error('GSI prompt error:', e); }
         });
     }
 
@@ -4859,5 +5214,73 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
     </script>
+    <!-- ===== EDIT TRANSACTION MODAL (popup, pre-filled, blurred backdrop) ===== -->
+    <div id="txSavingOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(6,6,16,0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:99999;">
+        <div style="background:#171330;border:1px solid rgba(168,181,255,0.25);border-radius:16px;padding:26px 34px;color:#fff;font-size:15px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,0.5);">
+            <div style="font-size:22px;margin-bottom:10px;">⏳</div>
+            Saving changes...
+        </div>
+    </div>
+    <div class="modal-overlay" id="editTxModal">
+        <div class="modal-box">
+            <div class="modal-title">Edit Transaction</div>
+            <div class="modal-sub" id="editTxSub">Update the transaction details</div>
+            <div class="modal-input-group"><label for="txmDate">Date</label><input type="date" id="txmDate"></div>
+            <div class="modal-input-group"><label for="txmPerson">Person</label><select id="txmPerson"></select></div>
+            <div class="modal-input-group"><label for="txmType">Type</label><select id="txmType"></select></div>
+            <div class="modal-input-group"><label for="txmCategory">Category</label><select id="txmCategory"></select></div>
+            <div class="modal-input-group"><label for="txmSubcategory">Subcategory</label><select id="txmSubcategory"></select></div>
+            <div class="modal-input-group"><label for="txmAmount">Amount (₱)</label><input type="number" id="txmAmount" step="0.01" placeholder="0.00"></div>
+            <div class="modal-input-group"><label for="txmDescription">Description</label><input type="text" id="txmDescription" placeholder="What's this for?"></div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="txmCancel" type="button" onclick="closeEditTxModal()">Cancel</button>
+                <button class="btn-save" id="txmSave" type="button" onclick="saveEditTxModal2()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+<script>
+// BUILD 2026-08-19-sync4 — masked official Google button: moves #g_id_signin INSIDE
+// #googleBtnWrap (so Google's real button fills the same box as the design pill) and
+// renders it responsively. The pill's CSS pointer-events:none makes every tap land on
+// Google's own button — no pinning, no opacity tricks, nothing to break.
+(function () {
+    'use strict';
+    function setupMaskedGoogleButton() {
+        var wrap = document.getElementById('googleBtnWrap');
+        var ov = document.getElementById('g_id_signin');
+        var pill = document.getElementById('googleSignInBtn');
+        if (!wrap || !ov || !pill) return;
+        // 1) Nest Google's official button inside the wrapper so it fills the pill's box.
+        if (ov.parentNode !== wrap) { wrap.appendChild(ov); }
+        // 2) Render the official button if it isn't there yet (idempotent; CSS forces 100% w/h).
+        if (typeof google !== 'undefined' && google.accounts && google.accounts.id && !ov.querySelector('iframe')) {
+            try {
+                google.accounts.id.renderButton(ov, { type: 'standard', theme: 'outline', size: 'large', shape: 'pill', width: wrap.clientWidth || 252 });
+            } catch (e) { console.error('GSI renderButton (sync4) error:', e); }
+        }
+        // 3) Hover/press feedback for the mask (it cannot receive pointer events itself).
+        wrap.addEventListener('mouseenter', function () { wrap.classList.add('mask-hover'); });
+        wrap.addEventListener('mouseleave', function () { wrap.classList.remove('mask-hover', 'mask-pressed'); });
+        wrap.addEventListener('mousedown', function () { wrap.classList.add('mask-pressed'); });
+        wrap.addEventListener('mouseup', function () { wrap.classList.remove('mask-pressed'); });
+        // 4) Safety net: if Google's iframe is ever missing, tapping the pill still opens the chooser.
+        wrap.addEventListener('click', function () {
+            if (!ov.querySelector('iframe') && typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+                google.accounts.id.prompt();
+            }
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupMaskedGoogleButton);
+    } else {
+        setupMaskedGoogleButton();
+    }
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(setupMaskedGoogleButton, 150);
+    });
+})();
+</script>
 </body>
 </html>
