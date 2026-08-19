@@ -2015,6 +2015,154 @@
             justify-content: center;
             align-self: center;
         }
+        /* ============================================================
+           TIER SYSTEM (appended 2026-08-19) - width-based responsive tiers
+           Tier 1: Phone      <= 500px  (off-canvas rail + stacked-card table)
+           Tier 2: Small tab  501-767px (slim rail + compact table + 2-col grids)
+           Tier 3: Tablet+    >= 768px  (existing desktop layout, defensive reset)
+           CSS-only: reuses the existing #sidebarToggle '.expanded' class.
+           ============================================================ */
+
+        /* ---- Tier 1: Phone (max-width: 500px) ---- */
+        @media (max-width: 500px) {
+            /* Off-canvas sidebar: 56px rail stays visible (keeps the toggle
+               reachable); expanding slides OVER content instead of pushing it. */
+            .sidebar {
+                width: 56px;
+                transform: translateX(calc(-100% + 56px));
+                transition: transform 0.3s ease, width 0.3s ease;
+            }
+            .sidebar:hover {
+                width: 56px;
+                transform: translateX(calc(-100% + 56px));
+            }
+            .sidebar.expanded {
+                width: min(240px, 80vw);
+                transform: translateX(0);
+                box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45);
+            }
+            /* Content keeps only the slim-rail margin; never pushed by the drawer */
+            .main-content { margin-left: 56px !important; }
+            .sidebar:hover ~ .main-content,
+            .sidebar.expanded ~ .main-content { margin-left: 56px !important; }
+            /* Dim scrim behind the open drawer */
+            .sidebar.expanded ~ .main-content::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.45);
+                z-index: 999;
+            }
+
+            /* Single-column layouts */
+            [class*="grid" i] { grid-template-columns: 1fr !important; }
+
+            /* Fluid inputs: kill fixed widths and iOS auto-zoom on focus */
+            input[type="date"],
+            input[type="month"],
+            .tx-filter-input,
+            .budget-overview {
+                width: 100% !important;
+                max-width: none !important;
+                min-width: 0 !important;
+                box-sizing: border-box;
+            }
+            input, select, textarea { font-size: 16px !important; }
+
+            /* Transaction table -> stacked cards (no data-label attrs in markup,
+               so labels are hardcoded per fixed column order) */
+            .tx-table,
+            .tx-table tbody,
+            .tx-table tr,
+            .tx-table td {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .tx-table { border-collapse: separate; }
+            .tx-table thead { display: none; }
+            .tx-table tr {
+                margin: 0 0 12px 0;
+                padding: 6px 0;
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 12px;
+                background: rgba(255, 255, 255, 0.03);
+            }
+            .tx-table td {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding: 6px 12px;
+                border: none;
+                white-space: normal;
+                text-align: left;
+                overflow-wrap: anywhere;
+            }
+            .tx-table td::before {
+                content: attr(data-label);
+                flex-shrink: 0;
+                font-size: 11px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                opacity: 0.55;
+            }
+            .tx-table td:nth-child(1)::before { content: "Date"; }
+            .tx-table td:nth-child(2)::before { content: "Person"; }
+            .tx-table td:nth-child(3)::before { content: "Type"; }
+            .tx-table td:nth-child(4)::before { content: "Category"; }
+            .tx-table td:nth-child(5)::before { content: "Subcategory"; }
+            .tx-table td:nth-child(6)::before { content: "Description"; }
+            .tx-table td:nth-child(7)::before { content: "Amount"; }
+            .tx-table td:nth-child(8)::before { content: ""; display: none; }
+            .tx-table td:nth-child(8) { justify-content: flex-end; }
+            .tx-row-actions { flex-wrap: wrap; }
+            .tx-row-actions button { min-height: 34px; }
+        }
+
+        /* ---- Tier 2: Small tablet / foldable inner (501-767px) ---- */
+        @media (min-width: 501px) and (max-width: 767px) {
+            /* Slim rail; hover/pin expands like desktop (content margin tracks it) */
+            .sidebar { width: 56px; }
+            .sidebar:hover,
+            .sidebar.expanded { width: 220px; }
+            .main-content { margin-left: 56px !important; }
+            .sidebar:hover ~ .main-content,
+            .sidebar.expanded ~ .main-content { margin-left: 220px !important; }
+
+            /* Two-column layouts for denser use of the wider screen */
+            [class*="grid" i] { grid-template-columns: 1fr 1fr !important; }
+
+            /* Compact, wrapping table (no scroll container needed) */
+            .tx-table td,
+            .tx-table th {
+                white-space: normal;
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+        }
+
+        /* ---- Tier 3: Tablet+ (min-width: 768px) ----
+           Re-asserts the exact base desktop values (68px rail / 220px expand),
+           so 768-800px windows no longer inherit the mobile <=800px rules. */
+        @media (min-width: 768px) {
+            .sidebar { width: 68px; }
+            .sidebar:hover,
+            .sidebar.expanded { width: 220px; }
+            .main-content { margin-left: 68px !important; }
+            .sidebar:hover ~ .main-content,
+            .sidebar.expanded ~ .main-content { margin-left: 220px !important; }
+            .tx-table,
+            .tx-table thead,
+            .tx-table tbody,
+            .tx-table tr,
+            .tx-table td,
+            .tx-table th {
+                display: revert;
+                white-space: normal;
+            }
+        }
     </style>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -2340,7 +2488,7 @@
         //  CONFIG
         // ============================================================
         // ★★★ REPLACE WITH YOUR DEPLOYED APPS SCRIPT URL ★★★
-        const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxSLHkfSACFpz3wfzWzSZrbwhn-9id8PbmJC02_88n6qWPwRlhV2ZgtF-cqjOugH5arg/exec";
+        const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzt9GQgMARrywx7i57hto2Pe1HOvQ5iHRZCg3vLnEHHszF5MrbIuIfbYAks-smdjJ5XDg/exec";
 
         const BANK_MAP = {
             "Emergency Fund": "GoTyme",
