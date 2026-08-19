@@ -2057,6 +2057,14 @@
             /* Single-column layouts */
             [class*="grid" i] { grid-template-columns: 1fr !important; }
 
+            /* Allow flex/grid containers to shrink on narrow phones (280-375px):
+               fixes page-header subtitle overflow and .rec-layout track inflation */
+            .page-header { flex-wrap: wrap; row-gap: 4px; }
+            .page-header > span { min-width: 0; }
+            .rec-layout { grid-template-columns: minmax(0, 1fr) !important; }
+            .person-panel { min-width: 0; }
+            .person-panel * { min-width: 0; }
+
             /* Fluid inputs: kill fixed widths and iOS auto-zoom on focus */
             input[type="date"],
             input[type="month"],
@@ -2310,7 +2318,7 @@
         <div id="page-add" class="page-view">
             <div class="page-header">
                 <span class="page-title">Add Transaction</span>
-                <span style="font-size:16px; font-weight:600; color:rgba(255,255,255,0.8); margin-left:16px; white-space:nowrap;">Log your income or expense</span>
+                <span style="font-size:16px; font-weight:600; color:rgba(255,255,255,0.8); margin-left:16px;">Log your income or expense</span>
             </div>
             <div class="page-content">
                 <div class="glass-card">
