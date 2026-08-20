@@ -3737,25 +3737,40 @@
                 `;
 
                 function buildBudgetHTML(expenseData, incomeData, person) {
-                    const typeGroups = { Income: {}, Expense: {} };
-                    const allData = [...expenseData, ...incomeData];
-                    allData.forEach(item => {
-                        const n = normalizeBudgetValues(item);
-                        if (n.actual > 0 || n.budgeted > 0) {
-                            const mainCat = getMainCategory(item.subcategory);
-                            const type = getCategoryType(mainCat);
-                            if (type === 'Other') return;
-                            if (!typeGroups[type][mainCat]) {
-                                typeGroups[type][mainCat] = { budgeted: 0, actual: 0, subs: {} };
-                            }
-                            typeGroups[type][mainCat].budgeted += n.budgeted;
-                            typeGroups[type][mainCat].actual += n.actual;
-                            if (!typeGroups[type][mainCat].subs[item.subcategory]) {
-                                typeGroups[type][mainCat].subs[item.subcategory] = { budgeted: 0, actual: 0 };
-                            }
-                            typeGroups[type][mainCat].subs[item.subcategory].budgeted += n.budgeted;
-                            typeGroups[type][mainCat].subs[item.subcategory].actual += n.actual;
+                    // Map every known category/subcategory to its budget/actual values,
+                    // defaulting to 0 so lines with nothing budgeted still render.
+                    const dataMap = { Income: {}, Expense: {} };
+                    function ensureCat(type, mainCat) {
+                        if (!dataMap[type][mainCat]) {
+                            dataMap[type][mainCat] = { budgeted: 0, actual: 0, subs: {} };
                         }
+                        return dataMap[type][mainCat];
+                    }
+                    [...expenseData, ...incomeData].forEach(item => {
+                        const n = normalizeBudgetValues(item);
+                        const mainCat = getMainCategory(item.subcategory);
+                        const type = getCategoryType(mainCat);
+                        if (type === 'Other') return;
+                        const cat = ensureCat(type, mainCat);
+                        cat.budgeted += n.budgeted;
+                        cat.actual += n.actual;
+                        if (!cat.subs[item.subcategory]) cat.subs[item.subcategory] = { budgeted: 0, actual: 0 };
+                        cat.subs[item.subcategory].budgeted += n.budgeted;
+                        cat.subs[item.subcategory].actual += n.actual;
+                    });
+                    // Pre-create zeroed entries for every known category/subcategory
+                    // (from subcategoryMap) so nothing is hidden at ₱0.
+                    incomeCategories.forEach(cat => {
+                        const c = ensureCat('Income', cat);
+                        (subcategoryMap[cat] || []).forEach(sub => {
+                            if (!c.subs[sub]) c.subs[sub] = { budgeted: 0, actual: 0 };
+                        });
+                    });
+                    expenseCategories.forEach(cat => {
+                        const c = ensureCat('Expense', cat);
+                        (subcategoryMap[cat] || []).forEach(sub => {
+                            if (!c.subs[sub]) c.subs[sub] = { budgeted: 0, actual: 0 };
+                        });
                     });
 
                     let html = '';
@@ -3848,29 +3863,24 @@
                         `;
                     }
 
-                    const incomeCats = Object.entries(typeGroups.Income).sort((a, b) => b[1].budgeted - a[1].budgeted);
-                    if (incomeCats.length > 0) {
-                        html += `<div class="budget-type-section">
-                            <div class="type-label income-label">💰 Income</div>`;
-                        incomeCats.forEach(([cat, vals]) => {
-                            html += buildCategoryBlock(cat, vals, 'Income');
-                        });
-                        html += `</div>`;
-                    }
+                    // Income section — every income category always shown, most-budgeted first.
+                    const incomeCats = incomeCategories.slice().sort((a, b) => dataMap.Income[b].budgeted - dataMap.Income[a].budgeted);
+                    html += `<div class="budget-type-section">
+                        <div class="type-label income-label">💰 Income</div>`;
+                    incomeCats.forEach(cat => {
+                        html += buildCategoryBlock(cat, dataMap.Income[cat], 'Income');
+                    });
+                    html += `</div>`;
 
-                    const expenseCats = Object.entries(typeGroups.Expense).sort((a, b) => b[1].budgeted - a[1].budgeted);
-                    if (expenseCats.length > 0) {
-                        html += `<div class="budget-type-section">
-                            <div class="type-label expense-label">📉 Expense</div>`;
-                        expenseCats.forEach(([cat, vals]) => {
-                            html += buildCategoryBlock(cat, vals, 'Expense');
-                        });
-                        html += `</div>`;
-                    }
+                    // Expense section — every expense category always shown, most-budgeted first.
+                    const expenseCats = expenseCategories.slice().sort((a, b) => dataMap.Expense[b].budgeted - dataMap.Expense[a].budgeted);
+                    html += `<div class="budget-type-section">
+                        <div class="type-label expense-label">📉 Expense</div>`;
+                    expenseCats.forEach(cat => {
+                        html += buildCategoryBlock(cat, dataMap.Expense[cat], 'Expense');
+                    });
+                    html += `</div>`;
 
-                    if (!html) {
-                        return '<div style="color:rgba(255,255,255,0.2); padding:8px 0;">No budget data.</div>';
-                    }
                     return html;
                 }
 
