@@ -2514,6 +2514,268 @@
         #googleSignInBtn { position: relative !important; width: 100% !important; height: 100% !important; z-index: 2 !important; pointer-events: none !important; cursor: pointer; }
         #googleBtnWrap.mask-hover #googleSignInBtn { filter: brightness(1.1); }
         #googleBtnWrap.mask-pressed #googleSignInBtn { transform: scale(0.98); }
+
+        /* ===== Floating Calculator Widget (bottom-right; draggable + resizable, NO blur) ===== */
+        #calcWidget {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 300px;
+            height: 430px;
+            z-index: 5000;
+            background: #16131f;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 22px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            container-type: size;
+            user-select: none;
+            -webkit-user-select: none;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        #calcWidget * {
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        #calcHeader {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 0 14px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            cursor: grab;
+            touch-action: none;
+        }
+        #calcHeader:active {
+            cursor: grabbing;
+        }
+        #calcHeader .calc-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.78);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            white-space: nowrap;
+        }
+        #calcDisplay {
+            flex-shrink: 0;
+            padding: 12px 16px 10px;
+            text-align: right;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            min-height: 0;
+        }
+        #calcExpr {
+            min-height: 17px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.35);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            direction: rtl;
+            text-align: left;
+        }
+        #calcResult {
+            font-size: clamp(20px, 8.5cqw, 44px);
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.5px;
+            line-height: 1.15;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            direction: rtl;
+            text-align: left;
+            transition: color 0.2s;
+        }
+        #calcResult.error {
+            color: #ff6b6b;
+        }
+
+        #calcKeys {
+            flex: 1;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 8px;
+            padding: 10px;
+        }
+        .calc-key {
+            border: none;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            font-size: clamp(14px, 4.2cqw, 22px);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, transform 0.08s, filter 0.15s;
+            touch-action: manipulation;
+            padding: 0;
+        }
+        .calc-key:hover {
+            background: rgba(255, 255, 255, 0.13);
+        }
+        .calc-key:active {
+            transform: scale(0.94);
+            background: rgba(255, 255, 255, 0.17);
+        }
+        .calc-key:focus-visible {
+            outline: 2px solid #a8b5ff;
+            outline-offset: 2px;
+        }
+        .calc-key.op {
+            background: rgba(168, 181, 255, 0.14);
+            color: #a8b5ff;
+        }
+        .calc-key.op:hover {
+            background: rgba(168, 181, 255, 0.26);
+        }
+        .calc-key.op.active {
+            background: #a8b5ff;
+            color: #0d0d1a;
+        }
+        .calc-key.fn {
+            color: rgba(255, 255, 255, 0.62);
+            font-size: clamp(13px, 3.8cqw, 20px);
+        }
+        .calc-key.eq {
+            grid-row: span 2;
+            background: linear-gradient(135deg, #6f7cff, #8b5cf6);
+            color: #fff;
+        }
+        .calc-key.eq:hover {
+            background: linear-gradient(135deg, #7d89ff, #9b6cf8);
+        }
+        .calc-key.zero {
+            grid-column: span 2;
+        }
+
+        /* Collapsed state: a small calculator icon (SVG, not emoji) bottom-right */
+        #calcWidget.collapsed {
+            width: auto !important;
+            height: auto !important;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            border-radius: 16px;
+            overflow: visible;
+            /* FIX: container-type:size + auto sizing = zero-size box, so the
+               icon overflowed 34px past the corner (54px icon - 20px gap).
+               Disable size containment while collapsed so auto sizes
+               shrink-wrap the icon and right/bottom:20px anchor it on-screen. */
+            container-type: normal;
+        }
+        #calcWidget.collapsed #calcHeader,
+        #calcWidget.collapsed #calcDisplay,
+        #calcWidget.collapsed #calcKeys,
+        #calcWidget.collapsed #calcResize {
+            display: none;
+        }
+        #calcWidget.collapsed #calcIcon {
+            display: flex;
+        }
+
+        #calcIcon {
+            display: none;
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
+            background: #16131f;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #a8b5ff;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            transition: transform 0.15s, background 0.15s, border-color 0.15s;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        #calcIcon:hover {
+            background: #211b33;
+            border-color: rgba(168, 181, 255, 0.45);
+            transform: translateY(-1px);
+        }
+        #calcIcon:active {
+            transform: scale(0.94);
+        }
+        #calcIcon:focus-visible {
+            outline: 2px solid #a8b5ff;
+            outline-offset: 2px;
+        }
+        #calcIcon svg {
+            pointer-events: none;
+        }
+
+        /* Minimize button in the header */
+        #calcMin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.55);
+            cursor: pointer;
+            padding: 0;
+            transition: background 0.15s, color 0.15s;
+        }
+        #calcMin:hover {
+            background: rgba(255, 255, 255, 0.10);
+            color: #fff;
+        }
+        #calcMin:active {
+            background: rgba(255, 255, 255, 0.16);
+        }
+        #calcMin:focus-visible {
+            outline: 2px solid #a8b5ff;
+            outline-offset: 1px;
+        }
+        #calcMin svg {
+            pointer-events: none;
+        }
+
+        #calcResize {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 24px;
+            height: 24px;
+            cursor: nwse-resize;
+            touch-action: none;
+            z-index: 2;
+            opacity: 0.45;
+            transition: opacity 0.2s;
+        }
+        #calcResize::after {
+            content: '';
+            position: absolute;
+            right: 5px;
+            bottom: 5px;
+            width: 9px;
+            height: 9px;
+            border-right: 2px solid rgba(255, 255, 255, 0.55);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.55);
+            border-bottom-right-radius: 3px;
+        }
+        #calcResize:hover,
+        #calcResize:active {
+            opacity: 1;
+        }
     </style>
         <!-- BUILD 2026-08-19-sync4 — exactly ONE VISIBLE sign-in button: the gradient pill (design) is all you see; Google's official button is INVISIBLE underneath and is still the live click target. If you still see 2 buttons, this file is NOT the one loaded; hard-refresh / clear site data. -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -5290,6 +5552,487 @@ document.addEventListener('DOMContentLoaded', function() {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(setupMaskedGoogleButton, 150);
     });
+})();
+</script>
+
+<!-- ===== Floating Calculator Widget (bottom-right; draggable + resizable, no blur) ===== -->
+<div id="calcWidget" class="collapsed" aria-label="Floating calculator">
+    <button type="button" id="calcIcon" title="Open calculator" aria-label="Open calculator" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+            <line x1="8" y1="6" x2="16" y2="6"></line>
+            <line x1="8" y1="11" x2="8" y2="11"></line>
+            <line x1="12" y1="11" x2="12" y2="11"></line>
+            <line x1="16" y1="11" x2="16" y2="11"></line>
+            <line x1="8" y1="15" x2="8" y2="15"></line>
+            <line x1="12" y1="15" x2="12" y2="15"></line>
+            <line x1="16" y1="15" x2="16" y2="15"></line>
+            <line x1="8" y1="19" x2="8" y2="19"></line>
+            <line x1="12" y1="19" x2="12" y2="19"></line>
+            <line x1="16" y1="19" x2="16" y2="19"></line>
+        </svg>
+    </button>
+    <div id="calcHeader" title="Drag to move">
+        <span class="calc-title">Calculator</span>
+        <button type="button" id="calcMin" title="Minimize" aria-label="Minimize calculator">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+    </div>
+    <div id="calcDisplay">
+        <div id="calcExpr">&nbsp;</div>
+        <div id="calcResult">0</div>
+    </div>
+    <div id="calcKeys">
+        <button type="button" class="calc-key fn" data-action="clear" title="Clear (Esc)">C</button>
+        <button type="button" class="calc-key fn" data-action="back" title="Delete (Backspace)">⌫</button>
+        <button type="button" class="calc-key op" data-op="÷" title="Divide">÷</button>
+        <button type="button" class="calc-key op" data-op="×" title="Multiply">×</button>
+        <button type="button" class="calc-key" data-digit="7">7</button>
+        <button type="button" class="calc-key" data-digit="8">8</button>
+        <button type="button" class="calc-key" data-digit="9">9</button>
+        <button type="button" class="calc-key op" data-op="−" title="Subtract">−</button>
+        <button type="button" class="calc-key" data-digit="4">4</button>
+        <button type="button" class="calc-key" data-digit="5">5</button>
+        <button type="button" class="calc-key" data-digit="6">6</button>
+        <button type="button" class="calc-key op" data-op="+" title="Add">+</button>
+        <button type="button" class="calc-key" data-digit="1">1</button>
+        <button type="button" class="calc-key" data-digit="2">2</button>
+        <button type="button" class="calc-key" data-digit="3">3</button>
+        <button type="button" class="calc-key eq" data-action="eq" title="Equals (Enter)">=</button>
+        <button type="button" class="calc-key zero" data-digit="0">0</button>
+        <button type="button" class="calc-key" data-digit=".">.</button>
+    </div>
+    <div id="calcResize" title="Resize"></div>
+</div>
+
+<script>
+// Floating calculator widget — draggable, resizable, chain-capable.
+(function () {
+    'use strict';
+    var widget = document.getElementById('calcWidget');
+    var header = document.getElementById('calcHeader');
+    var keys = document.getElementById('calcKeys');
+    var resize = document.getElementById('calcResize');
+    var resultEl = document.getElementById('calcResult');
+    var exprEl = document.getElementById('calcExpr');
+    var iconBtn = document.getElementById('calcIcon');
+    var minBtn = document.getElementById('calcMin');
+    if (!widget || !header || !keys || !resize || !resultEl || !exprEl || !iconBtn || !minBtn) return;
+
+    var STORE_KEY = 'budgefy.calc.v1';
+    var state = { current: '0', prev: null, op: null, justEvaluated: false, error: false, history: '' };
+
+    function fmt(n) {
+        if (typeof n !== 'number' || !isFinite(n)) return 'Error';
+        var s = parseFloat(n.toPrecision(12)).toString();
+        if (Math.abs(n) >= 1e15) s = n.toExponential(8);
+        return s;
+    }
+
+    function compute(a, op, b) {
+        switch (op) {
+            case '+': return a + b;
+            case '−': return a - b;
+            case '×': return a * b;
+            case '÷': return b === 0 ? null : a / b;
+            default: return b;
+        }
+    }
+
+    function resetAll() {
+        state.current = '0';
+        state.prev = null;
+        state.op = null;
+        state.justEvaluated = false;
+        state.error = false;
+        state.history = '';
+        render();
+    }
+
+    function showError() {
+        state.error = true;
+        state.current = '0';
+        state.prev = null;
+        state.op = null;
+        state.justEvaluated = false;
+        state.history = '';
+        render();
+    }
+
+    function render() {
+        if (state.error) {
+            resultEl.textContent = 'Error';
+            resultEl.classList.add('error');
+            exprEl.textContent = '\u00a0';
+            return;
+        }
+        resultEl.textContent = state.current === '' ? (state.prev !== null ? fmt(state.prev) : '0') : state.current;
+        resultEl.classList.remove('error');
+        exprEl.textContent = state.history || '\u00a0';
+        highlightOp();
+    }
+
+    function highlightOp() {
+        var btns = keys.querySelectorAll('.calc-key.op');
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].classList.toggle('active', btns[i].getAttribute('data-op') === state.op);
+        }
+    }
+
+    function inputDigit(d) {
+        if (state.error) { resetAll(); }
+        if (state.justEvaluated) {
+            state.current = (d === '.') ? '0.' : d;
+            state.justEvaluated = false;
+            state.history = '';
+            render();
+            return;
+        }
+        if (d === '.') {
+            if (state.current.indexOf('.') !== -1) return;
+            state.current = state.current === '' ? '0.' : state.current + '.';
+        } else {
+            if (state.current === '0') {
+                state.current = d;
+            } else if (state.current.length < 14) {
+                state.current += d;
+            }
+        }
+        render();
+    }
+
+    function inputOp(o) {
+        if (state.error) { resetAll(); }
+        if (state.justEvaluated) {
+            // Continue from the result: "5 + 3 = 8" then "+ 2 =" → 10
+            state.prev = parseFloat(state.current);
+            state.current = '';
+            state.op = o;
+            state.justEvaluated = false;
+            state.history = fmt(state.prev) + ' ' + o + ' ';
+            render();
+            return;
+        }
+        if (state.current === '' && state.prev !== null) {
+            // Double operator → keep the last one pressed
+            state.op = o;
+            state.history = fmt(state.prev) + ' ' + o + ' ';
+            render();
+            return;
+        }
+        var cur = parseFloat(state.current);
+        if (state.op !== null && state.prev !== null) {
+            // Chain: evaluate pending op first, then start a new one
+            var r = compute(state.prev, state.op, cur);
+            if (r === null) { showError(); return; }
+            state.prev = r;
+            state.current = '';
+            state.op = o;
+            state.history = fmt(r) + ' ' + o + ' ';
+        } else {
+            state.prev = cur;
+            state.current = '';
+            state.op = o;
+            state.history = fmt(cur) + ' ' + o + ' ';
+        }
+        render();
+    }
+
+    function equals() {
+        if (state.error) { resetAll(); return; }
+        if (state.op === null) return; // nothing pending
+        if (state.current === '') return; // e.g. "5 + =" — ignore
+        var b = parseFloat(state.current);
+        var r = compute(state.prev, state.op, b);
+        if (r === null) { showError(); return; }
+        state.history = fmt(state.prev) + ' ' + state.op + ' ' + fmt(b) + ' =';
+        state.current = fmt(r);
+        state.prev = null;
+        state.op = null;
+        state.justEvaluated = true;
+        render();
+    }
+
+    function backspace() {
+        if (state.error || state.justEvaluated) { resetAll(); return; }
+        if (state.current.length <= 1) {
+            state.current = '0';
+        } else {
+            state.current = state.current.slice(0, -1);
+        }
+        render();
+    }
+
+    // Button clicks
+    keys.addEventListener('click', function (e) {
+        var btn = e.target.closest ? e.target.closest('button.calc-key') : null;
+        if (!btn) return;
+        if (btn.hasAttribute('data-digit')) inputDigit(btn.getAttribute('data-digit'));
+        else if (btn.hasAttribute('data-op')) inputOp(btn.getAttribute('data-op'));
+        else if (btn.getAttribute('data-action') === 'clear') resetAll();
+        else if (btn.getAttribute('data-action') === 'back') backspace();
+        else if (btn.getAttribute('data-action') === 'eq') equals();
+    });
+
+    // Keyboard: digits, ., + − * /, Esc (clear), Backspace (delete), Enter (=)
+    document.addEventListener('keydown', function (e) {
+        var t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+        if (widget.classList.contains('collapsed')) return; // keyboard only while open
+        var k = e.key;
+        if (/^[0-9]$/.test(k)) { inputDigit(k); e.preventDefault(); }
+        else if (k === '.') { inputDigit('.'); e.preventDefault(); }
+        else if (k === '+') { inputOp('+'); e.preventDefault(); }
+        else if (k === '-') { inputOp('−'); e.preventDefault(); }
+        else if (k === '*') { inputOp('×'); e.preventDefault(); }
+        else if (k === '/') { inputOp('÷'); e.preventDefault(); }
+        else if (k === 'Enter') { equals(); e.preventDefault(); }
+        else if (k === 'Escape') { resetAll(); e.preventDefault(); }
+        else if (k === 'Backspace') { backspace(); e.preventDefault(); }
+    });
+
+    // Collapsed (icon) ⇄ expanded (panel)
+    var dragSuppressUntil = 0; // suppress the icon click if the gesture was a drag
+
+    function openCalc() {
+        widget.classList.remove('collapsed');
+        iconBtn.setAttribute('aria-expanded', 'true');
+        iconBtn.blur();
+        // Restore the panel's previous size, clamped to the viewport so it can
+        // never open (partly) off-screen.
+        var savedW = 0, savedH = 0;
+        try {
+            var saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+            if (saved && typeof saved.w === 'number') savedW = saved.w;
+            if (saved && typeof saved.h === 'number') savedH = saved.h;
+        } catch (err) { /* ignore */ }
+        var pw = Math.max(240, Math.min(savedW || 300, window.innerWidth - 24));
+        var ph = Math.max(310, Math.min(savedH || 430, window.innerHeight - 24));
+        widget.style.width = pw + 'px';
+        widget.style.height = ph + 'px';
+        widget.style.left = Math.max(8, Math.round((window.innerWidth - pw) / 2)) + 'px';
+        widget.style.top = Math.max(8, Math.round((window.innerHeight - ph) / 2)) + 'px';
+        widget.style.right = 'auto';
+        widget.style.bottom = 'auto';
+    }
+    function minimizeCalc() {
+        widget.classList.add('collapsed');
+        // Always snap the button back to the bottom-right corner. Reset BOTH
+        // edges: openCalc leaves right/bottom as inline 'auto', which would
+        // otherwise park the icon at the top-left.
+        widget.style.right = '20px';
+        widget.style.bottom = '20px';
+        widget.style.left = 'auto';
+        widget.style.top = 'auto';
+        iconBtn.setAttribute('aria-expanded', 'false');
+        minBtn.blur();
+    }
+    iconBtn.addEventListener('click', function () {
+        if (Date.now() < dragSuppressUntil) return; // was a drag, not a click
+        openCalc();
+    });
+    minBtn.addEventListener('click', minimizeCalc);
+
+    // Drag to move (pointer events → works with mouse + touch); header when
+    // expanded, the icon button when collapsed.
+    function makeDraggable(handle) {
+        handle.addEventListener('pointerdown', function (e) {
+            if (e.button !== undefined && e.button !== 0) return;
+            // Don't start a drag when pressing the minimize button
+            if (e.target.closest && e.target.closest('#calcMin')) return;
+            e.preventDefault();
+            var startX = e.clientX, startY = e.clientY;
+            var rect = widget.getBoundingClientRect();
+            var origLeft = rect.left, origTop = rect.top;
+            var moved = false;
+            handle.setPointerCapture(e.pointerId);
+            function move(ev) {
+                var dx = ev.clientX - startX, dy = ev.clientY - startY;
+                if (!moved && Math.abs(dx) + Math.abs(dy) > 4) moved = true;
+                var maxX = Math.max(8, window.innerWidth - widget.offsetWidth - 8);
+                var maxY = Math.max(8, window.innerHeight - widget.offsetHeight - 8);
+                var nx = Math.min(Math.max(origLeft + dx, 8), maxX);
+                var ny = Math.min(Math.max(origTop + dy, 8), maxY);
+                widget.style.left = nx + 'px';
+                widget.style.top = ny + 'px';
+                widget.style.right = 'auto';
+                widget.style.bottom = 'auto';
+            }
+            function up() {
+                handle.removeEventListener('pointermove', move);
+                handle.removeEventListener('pointerup', up);
+                handle.removeEventListener('pointercancel', up);
+                if (moved) dragSuppressUntil = Date.now() + 150;
+                saveState();
+            }
+            handle.addEventListener('pointermove', move);
+            handle.addEventListener('pointerup', up);
+            handle.addEventListener('pointercancel', up);
+        });
+    }
+    makeDraggable(header); // only the panel is draggable; the icon stays pinned bottom-right
+
+    // Resize from the bottom-right corner
+    resize.addEventListener('pointerdown', function (e) {
+        if (e.button !== undefined && e.button !== 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var startX = e.clientX, startY = e.clientY;
+        var sw = widget.offsetWidth, sh = widget.offsetHeight;
+        resize.setPointerCapture(e.pointerId);
+        function move(ev) {
+            var nw = Math.min(Math.max(sw + (ev.clientX - startX), 240), window.innerWidth - 8);
+            var nh = Math.min(Math.max(sh + (ev.clientY - startY), 310), window.innerHeight - 8);
+            widget.style.width = nw + 'px';
+            widget.style.height = nh + 'px';
+            // keep the widget fully on-screen
+            var r = widget.getBoundingClientRect();
+            if (r.right > window.innerWidth) widget.style.left = (window.innerWidth - nw) + 'px';
+            if (r.bottom > window.innerHeight) widget.style.top = (window.innerHeight - nh) + 'px';
+            widget.style.right = 'auto';
+            widget.style.bottom = 'auto';
+        }
+        function up() {
+            resize.removeEventListener('pointermove', move);
+            resize.removeEventListener('pointerup', up);
+            resize.removeEventListener('pointercancel', up);
+            saveState();
+        }
+        resize.addEventListener('pointermove', move);
+        resize.addEventListener('pointerup', up);
+        resize.addEventListener('pointercancel', up);
+    });
+
+    function saveState() {
+        try {
+            var data = {};
+            // Keep the last real panel size; while collapsed the widget shrinks
+            // to the icon, and we must not overwrite w/h with the icon's size.
+            var prev = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+            if (prev && typeof prev.w === 'number') data.w = prev.w;
+            if (prev && typeof prev.h === 'number') data.h = prev.h;
+            if (!widget.classList.contains('collapsed')) {
+                var rect = widget.getBoundingClientRect();
+                data.w = Math.min(Math.round(rect.width), window.innerWidth - 24);
+                data.h = Math.min(Math.round(rect.height), window.innerHeight - 24);
+            }
+            localStorage.setItem(STORE_KEY, JSON.stringify(data));
+        } catch (err) { /* storage unavailable — ignore */ }
+    }
+
+    // Restore saved size only (the collapsed button always sits bottom-right)
+    try {
+        var saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+        if (saved) {
+            if (typeof saved.w === 'number' && saved.w >= 240) {
+                widget.style.width = Math.min(saved.w, window.innerWidth - 24) + 'px';
+            }
+            if (typeof saved.h === 'number' && saved.h >= 310) {
+                widget.style.height = Math.min(saved.h, window.innerHeight - 24) + 'px';
+            }
+        }
+    } catch (err) { /* ignore */ }
+
+    render();
+})();
+</script>
+
+<style>
+  /* Calculator item in the sidebar footer, directly above Logout */
+  .calc-menu-item {
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    padding: 8px;
+    margin-top: 6px;
+    color: #a8b5ff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-height: 36px;
+    transition: background 0.2s;
+  }
+  .calc-menu-item:hover { background: rgba(168, 181, 255, 0.15); }
+  .sidebar:hover .calc-menu-item,
+  .sidebar.expanded .calc-menu-item {
+    background: rgba(168, 181, 255, 0.15);
+    border: 1px solid rgba(168, 181, 255, 0.25);
+    border-radius: 20px;
+    padding: 6px 14px;
+    width: 100%;
+    margin-top: 8px;
+  }
+  .calc-menu-item .calc-menu-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .calc-menu-item .calc-menu-icon svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+  }
+</style>
+
+<script>
+(function () {
+  'use strict';
+
+  var footer = document.querySelector('.sidebar-footer');
+  if (!footer) return;
+
+  // The Logout button is injected ~500ms after load (addLogoutButton), so
+  // wait for it, then insert the Calculator item directly above it.
+  function insertCalcItem() {
+    var logoutBtn = footer.querySelector('.logout-btn');
+    if (!logoutBtn) return false;
+    if (document.getElementById('calcMenuBtn')) return true;
+
+    var item = document.createElement('button');
+    item.type = 'button';
+    item.id = 'calcMenuBtn';
+    item.title = 'Calculator';
+    item.setAttribute('aria-label', 'Calculator');
+    item.className = 'calc-menu-item';
+    item.innerHTML =
+      '<span class="calc-menu-icon">' +
+      '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<rect x="4" y="2" width="16" height="20" rx="2"></rect>' +
+      '<line x1="8" y1="6" x2="16" y2="6"></line>' +
+      '<line x1="8" y1="11" x2="8" y2="11"></line>' +
+      '<line x1="12" y1="11" x2="12" y2="11"></line>' +
+      '<line x1="16" y1="11" x2="16" y2="11"></line>' +
+      '<line x1="8" y1="15" x2="8" y2="15"></line>' +
+      '<line x1="12" y1="15" x2="12" y2="15"></line>' +
+      '<line x1="16" y1="15" x2="16" y2="15"></line>' +
+      '<line x1="8" y1="19" x2="8" y2="19"></line>' +
+      '<line x1="12" y1="19" x2="12" y2="19"></line>' +
+      '<line x1="16" y1="19" x2="16" y2="19"></line>' +
+      '</svg></span>' +
+      '<span class="logout-label calc-menu-label">Calculator</span>';
+
+    // Clicking it opens the calculator via the same code path as the
+    // floating icon (openCalc is closure-scoped, so reuse #calcIcon.click).
+    item.addEventListener('click', function () {
+      if (typeof window.openCalc === 'function') { window.openCalc(); return; }
+      var icon = document.getElementById('calcIcon');
+      if (icon) icon.click();
+    });
+
+    footer.insertBefore(item, logoutBtn);
+    return true;
+  }
+
+  if (insertCalcItem()) return;
+
+  var mo = new MutationObserver(function () {
+    if (insertCalcItem()) mo.disconnect();
+  });
+  mo.observe(footer, { childList: true, subtree: true });
+  // Safety net if the observer ever misses it
+  setTimeout(function () { if (insertCalcItem()) mo.disconnect(); }, 3000);
 })();
 </script>
 </body>
